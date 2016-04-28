@@ -5,7 +5,10 @@
    
     <label class="item item-input">
       <i class="icon ion-search placeholder-icon"></i>
-      <input type="text" placeholder="What are you looking for?" ng-model="itemName">
+      <input 
+        type="text" 
+        placeholder="What are you looking for?" 
+        ng-model="itemName">
     </label>
 
      <label class="item item-input item-select">
@@ -33,7 +36,7 @@
 
   <div class="row" style="margin-bottom:20px;">
     <div class="col col-33 col-offset-33">
-      <button style="width:100%" class="button button-energized" ng-click="findItem()"> Find it! </button>
+      <button style="width:100%" class="button button-energized" ng-click="findItem(itemName)"> Find it! </button>
     </div>
   </div>
 
