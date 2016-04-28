@@ -1,14 +1,22 @@
 angular.module('starter.controllers', [])
 
 .controller('findController', function($scope, ItemFactory) {
-  $scope.$on('$ionicView.enter', function(e) {
-    ItemFactory.getAreas().then(function(res){
-      $scope.areas = res.data;
+
+//on page load, load areas and categories into dropdown
+  ItemFactory.getAreas().then(function(areaData){
+    $scope.areas = areaData.data;
+    ItemFactory.getCategories().then(function(categoryData){
+      $scope.categories = categoryData.data;
     });
   });
+
+  $scope.findItem = function(){
+    
+  };
 });
 
 
+  
 
 // .controller('ChatsCtrl', function($scope, Chats) {
 //   // With the new view caching in Ionic, Controllers are only called
