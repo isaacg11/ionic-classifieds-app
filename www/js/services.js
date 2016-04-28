@@ -39,4 +39,17 @@ angular.module('starter.services', [])
       return q.promise;
     },
   };
+}])
+
+.factory('userFactory', ["$q", function($q) {
+
+  return {
+    getUser: function() {
+      var q = $q.defer();
+      Stamplay.User.currentUser().then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
+  };
 }]);

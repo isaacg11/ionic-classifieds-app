@@ -54,10 +54,14 @@
           placeholder="Your Address" 
           ng-model="item.address">
       </label>
-      <input type="file" id="files">
+      <input
+        id="files" 
+        type="file" 
+        name="file" 
+        onchange="angular.element(this).scope().photoChanged(this.files)"/>
       <div class="row">
         <div class="col col-80 col-offset-10">
-          <img id="image-preview" style="width:100%"/>
+          <img ng-src="{{ thumbnail.dataUrl }}" style="width:100%"/>
         </div>
       </div>
       <div class="row" style="margin-top:20px;">
