@@ -25,12 +25,12 @@
 		<!-- Offerts list-->
 		<ion-list class="list">
 		    <ion-item> {{items.length+' Offers' || 'No Offer' }} </ion-item>     
-		    <ion-item class="item item-thumbnail-left" ng-repeat="object in items"> 
-		      <img ng-src="{{object.photo}}">
+		    <ion-item class="item item-thumbnail-left" ng-repeat="item in items track by $index"> 
+		      <img ng-src="{{item.photo}}">
 		      <button 
 		      	class="button button-clear button-assertive" 
 		      	style="position:inherit;float:right;min-height: 0px;min-width: 0px;line-height:normal;" 
-		      	ng-click="delete(object)">
+		      	ng-click="delete(item._id, $index)">
 		      	<li 
 		      		class="ion-close-round" 
 		      		data-pack="default" 
@@ -38,12 +38,12 @@
 		      		style="display: inline-block;">
 		      	</li>
 		      </button>
-		      <h2 style="text-align:left">{{object.name}}</h2>
-		      <p style="text-align:left">{{object.description}}</p>
-		      <p style="text-align:left">{{object.dt_create | date:'mediumDate'}}
+		      <h2 style="text-align:left">{{item.name}}</h2>
+		      <p style="text-align:left">{{item.description}}</p>
+		      <p style="text-align:left">{{item.dt_create | date:'mediumDate'}}
 		        <span 
 		        	class="badge badge-positive" 
-		        	style="position:inherit;float:right;">{{object.price}} €
+		        	style="position:inherit;float:right;">$ {{item.price}} 
 		        </span>
 		      </p>
 		    </ion-item>

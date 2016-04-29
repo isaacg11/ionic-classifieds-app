@@ -103,10 +103,20 @@ angular.module('starter.controllers', [])
 //on page load, check for user logged in
   userFactory.getUser().then(function(res){
     $scope.user = res;
+    userFactory.getItems().then(function(res){
+      $scope.items = res.data;
+    });
   });
 //navigate to login view
   $scope.goToLogin = function() {
     $state.go('tab.login', {});
+  };
+
+  $scope.delete = function(id, index){
+    $scope.items.splice(index, 1);
+    userFactory.deleteTask(id).then(function(){
+      console.log('item deleted');
+    });
   };
 })
 

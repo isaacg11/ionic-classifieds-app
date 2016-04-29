@@ -51,5 +51,20 @@ angular.module('starter.services', [])
       });
       return q.promise;
     },
+    getItems: function() {
+      var q = $q.defer();
+      Stamplay.Object("item").findByCurrentUser(["owner"]).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
+    deleteTask : function(id) {
+      var q = $q.defer();
+      var objectID = id;
+      Stamplay.Object('item').remove(objectID, function(res){
+          q.resolve(res);
+      });
+      return q.promise;
+    }
   };
 }]);
