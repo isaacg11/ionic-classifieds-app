@@ -53,7 +53,7 @@
           <ion-item 
             class="item item-thumbnail-left complex-item" 
             ng-repeat="item in items" 
-            ng-click="goToItemView(item.area[0], item.tags[0], item.description, item.name, item.price, item.dt_create, item.photo)"> 
+            ng-click="goToItemView(item.area[0], item.tags[0], item.description, item.name, item.price, item.dt_create, item.photo, item.owner)"> 
             <img ng-src="{{item.photo}}">
             <h2>{{item.name}}</h2>
             <p>{{item.description}}</p>

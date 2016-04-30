@@ -67,6 +67,13 @@ angular.module('starter.services', [])
       });
       return q.promise;
     },
+    getSellerEmail: function(id) {
+      var q = $q.defer();
+      Stamplay.User.get({ _id : id}).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
     getAreaName: function(id) {
       var q = $q.defer();
       Stamplay.Object('area').get({ _id : id}).then(function(res){
@@ -90,6 +97,15 @@ angular.module('starter.services', [])
     },
   };
 }])
+
+.factory('IonicComponent',function($ionicModal, $ionicScrollDelegate, $ionicLoading, $ionicPopup){
+  return {
+    Modal: $ionicModal,
+    ScrollDelegate: $ionicScrollDelegate,
+    Loading: $ionicLoading,
+    Popup: $ionicPopup
+  };
+})
 
 .factory('userFactory', ["$q", function($q) {
 

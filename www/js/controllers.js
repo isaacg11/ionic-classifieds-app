@@ -1,13 +1,13 @@
 angular.module('starter.controllers', [])
 
-.controller('findController', function($scope, ItemFactory, $state) {
+.controller('findController', function($scope, ItemFactory, $state, IonicComponent) {
 //navigate to item-view state with object id
-  $scope.goToItemView = function(areaId, tagsId, description, name, price, dt, photo) {
+  $scope.goToItemView = function(areaId, tagsId, description, name, price, dt, photo, ownerId) {
     ItemFactory.getAreaName(areaId).then(function(res){
       var area = res.data[0].name;
       ItemFactory.getCategoryName(tagsId).then(function(res){
         var tags = res.data[0].name;
-        $state.go('item-view', {obj:[area, tags, description, name, price, dt, photo]});
+        $state.go('item-view', {obj:[area, tags, description, name, price, dt, photo, ownerId]});
       });
     });
   };
@@ -19,6 +19,7 @@ angular.module('starter.controllers', [])
       $scope.categories = categoryData.data;
       ItemFactory.getAllItems().then(function(itemData){
         $scope.items = itemData.data;
+        IonicComponent.ScrollDelegate.scrollTo(0,245, true);
       });
     });
   });
@@ -78,7 +79,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('itemController', function($scope, $stateParams, ItemFactory) {
+.controller('itemController', function($scope, $stateParams, ItemFactory, IonicComponent) {
 //on page load, display item data
   $scope.area = $stateParams.obj[0];
   $scope.category = $stateParams.obj[1];
@@ -87,12 +88,42 @@ angular.module('starter.controllers', [])
   $scope.price = $stateParams.obj[4];
   $scope.date = $stateParams.obj[5];
   $scope.image = $stateParams.obj[6];
+  var ownerId = $stateParams.obj[7];
+  var itemName = $stateParams.obj[3];
+//modal operations
+  IonicComponent.Modal.fromTemplateUrl('my-modal.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
 
   $scope.openModal = function() {
     $scope.modal.show();
   };
+  $scope.closeModal = function() {
+    $scope.modal.hide();
+  };
+  $scope.$on('$destroy', function() {
+    $scope.modal.remove();
+  });
 
+  $scope.sendEmail = function(user) {
+    ItemFactory.getSellerEmail(ownerId).then(function(res){
+      var email = {
+        to: res.data[0].email,
+        from: user.email,
+        body: user.message,
+        itemName: itemName
+      };
+      Stamplay.Object('email').save(email).then(function(res){
+        console.log(res);
+      });
+    });
+  };
 })
+
+
 
 .controller('publishController', function($scope, $http, ItemFactory, $timeout) {
 //image preview
