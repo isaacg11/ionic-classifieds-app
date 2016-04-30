@@ -1,24 +1,71 @@
 angular.module('starter.controllers', [])
 
 .controller('findController', function($scope, ItemFactory) {
-//on page load, load areas and categories into dropdown
+//on page load, load areas, categories, and items data
   ItemFactory.getAreas().then(function(areaData){
     $scope.areas = areaData.data;
     ItemFactory.getCategories().then(function(categoryData){
       $scope.categories = categoryData.data;
+      ItemFactory.getAllItems().then(function(itemData){
+        $scope.items = itemData.data;
+      });
     });
   });
 
-  $scope.findItem = function(itemName){
-//if user does not enter a name, search by area and category
+  $scope.findItem = function(itemName, item){
+//show loading transition 
+    $scope.visible = true;
+    $scope.load = true;
+    $scope.items = {};
+// if user does not enter a name, search by area and category only
     if(angular.equals(itemName, undefined)){
-
+      itemName = '';
+      ItemFactory.getAreaId(item.selectedArea).then(function(res){
+        var areaId = res.data[0]._id;
+        ItemFactory.getCategoryId(item.selectedCategory).then(function(res){
+          var categoryId = res.data[0]._id;
+          var query = {
+            name: itemName,
+            area: areaId,
+            tags: categoryId
+          };
+          ItemFactory.getItemQuery(query).then(function(res){
+            $scope.items = res.data;
+          });
+        });
+      });
     }
-//else search item by name
+// if user does not select an area & category, search by name only
+    else if(item === undefined) {
+      var query = {
+          name: itemName,
+          area: '',
+          tags: ''
+      };
+      ItemFactory.getItemQuery(query).then(function(res){
+        $scope.items = res.data;
+      });
+    }
+// if user selects all 3 search options, search by name, area, and category
     else{
-
+      ItemFactory.getAreaId(item.selectedArea).then(function(res){
+        var areaId = res.data[0]._id;
+        ItemFactory.getCategoryId(item.selectedCategory).then(function(res){
+          var categoryId = res.data[0]._id;
+          var query = {
+            name: itemName,
+            area: areaId,
+            tags: categoryId
+          };
+          ItemFactory.getItemQuery(query).then(function(res){
+            $scope.items = res.data;
+          });
+        });
+      });
     }
+    $scope.load = false;
   };
+
 })
 
 .controller('publishController', function($scope, $http, ItemFactory, $timeout) {
@@ -86,7 +133,7 @@ angular.module('starter.controllers', [])
           xhr.open('PATCH', 'https://ionic-ebay-app.stamplayapp.com/api/cobject/v1/item/'+res._id, true);
           xhr.onload = function(e) {
             if(xhr.status >= 200 && xhr.status < 400) {
-              console.log(JSON.parse(xhr.response));
+              console.log('item published successfully');
             } 
             else {
               console.error(xhr.status + " (" + xhr.statusText + ")" + ": " + xhr.responseText);
@@ -100,13 +147,19 @@ angular.module('starter.controllers', [])
 })
 
 .controller('accountController', function($scope, userFactory, $state) {
-//on page load, check for user logged in
+//on page load, check for user logged in and get offers for logged users
   userFactory.getUser().then(function(res){
-    $scope.user = res;
-    userFactory.getItems().then(function(res){
-      $scope.items = res.data;
-    });
+    if(res === 'not logged in'){
+      $scope.notLogged = res;
+    }
+    else{
+      $scope.user = res;
+      userFactory.getItems().then(function(res){
+        $scope.items = res.data;
+      });
+    }    
   });
+    
 //navigate to login view
   $scope.goToLogin = function() {
     $state.go('tab.login', {});
@@ -120,10 +173,15 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('loginController', function($scope, userFactory, $state) {
+.controller('loginController', function($scope) {
+  $scope.login = function(user) {
+    Stamplay.User.login(user).then(function(res){
+      console.log('login successful');
+    });
+  };
 })
 
-.controller('signupController', function($scope, $state) {
+.controller('signupController', function($scope) {
   $scope.signup = function(user) {
     var userInfo = {
       firstName: user.firstName,

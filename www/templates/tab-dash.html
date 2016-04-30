@@ -36,7 +36,11 @@
 
   <div class="row" style="margin-bottom:20px;">
     <div class="col col-33 col-offset-33">
-      <button style="width:100%" class="button button-energized" ng-click="findItem(itemName)"> Find it! </button>
+      <button 
+        style="width:100%" 
+        class="button button-energized" 
+        ng-click="findItem(itemName, item)"> Find it! 
+      </button>
     </div>
   </div>
 
@@ -51,13 +55,15 @@
 
     <ion-item ng-show="visible"> {{items.length+' Offers' || 'No Offer' }} </ion-item>
 
-    <ion-item class="item item-thumbnail-left complex-item" ng-repeat="object in items" href="#/tab/item/{{object._id}}" > 
-      <img ng-src="{{object.photo}}">
-      <h2>{{object.name}}</h2>
-      <p>{{object.description}}</p>
+    <ion-item 
+      class="item item-thumbnail-left complex-item" 
+      ng-repeat="item in items" href="#/tab/item/{{item._id}}"> 
+      <img ng-src="{{item.photo}}">
+      <h2>{{item.name}}</h2>
+      <p>{{item.description}}</p>
       <p>
-        {{object.dt_create | date:'mediumDate'}}
-        <span class="badge badge-positive" style="position:inherit;float:right;">{{object.price}} €
+        {{item.dt_create | date:'mediumDate'}}
+        <span class="badge badge-positive" style="position:inherit;float:right;">$ {{item.price}}
         </span>
       </p>
     </ion-item>

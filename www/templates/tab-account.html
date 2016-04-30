@@ -6,7 +6,7 @@
     	on-refresh="doRefresh()">
   	</ion-refresher>
   	<!-- USER IS LOGGED -->
-	<div style="text-align:center" ng-show="user">
+	<div style="text-align:center" ng-hide="!user">
 		<h3>Hi {{user.user.firstName}} ! </h3>
 		<!-- SPINNER -->
 		<div 
@@ -50,7 +50,7 @@
 		</ion-list>
 	</div>
 	<!-- USER NOT LOGGED -->
-	<div style="text-align:center" ng-show="!user">
+	<div style="text-align:center" ng-hide="user">
 		<h4>Please Login</h4>
 		<button class="button button-energized" ng-click="goToLogin()">Go to Login</button>
 	</div>

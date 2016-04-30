@@ -17,6 +17,13 @@ angular.module('starter.services', [])
       });
       return q.promise;
     },
+    getAllItems : function() {
+      var q = $q.defer();
+      Stamplay.Object('item').get({ cobjectId : 'item'}).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
     getAreaId: function(itemArea) {
       var q = $q.defer();
       Stamplay.Object('area').get({ name : itemArea}).then(function(res){
@@ -29,6 +36,28 @@ angular.module('starter.services', [])
       Stamplay.Object('category').get({ name : itemCategory}).then(function(res){
         q.resolve(res);
       });
+      return q.promise;
+    },
+    getItemQuery : function(query) {
+      var q = $q.defer();      
+      if(query.name === ''){
+        Stamplay.Query("object", "item").equalTo('area',query.area).equalTo('tags', query.tags).exec().
+        then(function(res) {
+          q.resolve(res);
+        });
+      }
+      else if(query.area === '' && query.tags === ''){
+        Stamplay.Query("object", "item").equalTo('name', query.name).exec().
+        then(function(res) {
+          q.resolve(res);
+        });
+      }
+      else{
+        Stamplay.Query("object", "item").equalTo('name',query.name).equalTo('area',query.area).equalTo('tags', query.tags).exec().
+        then(function(res) {
+          q.resolve(res);
+        });
+      }
       return q.promise;
     },
     createItem: function(itemInfo) {
@@ -45,9 +74,16 @@ angular.module('starter.services', [])
 
   return {
     getUser: function() {
+      var data;
       var q = $q.defer();
       Stamplay.User.currentUser().then(function(res){
-        q.resolve(res);
+        if(res.user.__v === 0){
+          data = res;
+        }
+        else{
+          data = "not logged in";
+        }
+        q.resolve(data);
       });
       return q.promise;
     },
