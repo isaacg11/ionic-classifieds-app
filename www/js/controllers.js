@@ -1,6 +1,17 @@
 angular.module('starter.controllers', [])
 
-.controller('findController', function($scope, ItemFactory) {
+.controller('findController', function($scope, ItemFactory, $state) {
+//navigate to item-view state with object id
+  $scope.goToItemView = function(areaId, tagsId, description, name, price, dt, photo) {
+    ItemFactory.getAreaName(areaId).then(function(res){
+      var area = res.data[0].name;
+      ItemFactory.getCategoryName(tagsId).then(function(res){
+        var tags = res.data[0].name;
+        $state.go('item-view', {obj:[area, tags, description, name, price, dt, photo]});
+      });
+    });
+  };
+
 //on page load, load areas, categories, and items data
   ItemFactory.getAreas().then(function(areaData){
     $scope.areas = areaData.data;
@@ -19,13 +30,12 @@ angular.module('starter.controllers', [])
     $scope.items = {};
 // if user does not enter a name, search by area and category only
     if(angular.equals(itemName, undefined)){
-      itemName = '';
       ItemFactory.getAreaId(item.selectedArea).then(function(res){
         var areaId = res.data[0]._id;
         ItemFactory.getCategoryId(item.selectedCategory).then(function(res){
           var categoryId = res.data[0]._id;
           var query = {
-            name: itemName,
+            name: '',
             area: areaId,
             tags: categoryId
           };
@@ -68,13 +78,27 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('publishController', function($scope, $http, ItemFactory, $timeout) {
+.controller('itemController', function($scope, $stateParams, ItemFactory) {
+//on page load, display item data
+  $scope.area = $stateParams.obj[0];
+  $scope.category = $stateParams.obj[1];
+  $scope.description = $stateParams.obj[2];
+  $scope.name = $stateParams.obj[3];
+  $scope.price = $stateParams.obj[4];
+  $scope.date = $stateParams.obj[5];
+  $scope.image = $stateParams.obj[6];
 
-//image preview
-  $scope.thumbnail = {
-    dataUrl: 'adsfas'
+  $scope.openModal = function() {
+    $scope.modal.show();
   };
 
+})
+
+.controller('publishController', function($scope, $http, ItemFactory, $timeout) {
+//image preview
+  $scope.thumbnail = {
+    dataUrl: 'https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwjd44G5i7XMAhWIdR4KHbM1DJkQjRwIBw&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FWhite_flag&psig=AFQjCNEul4RFSNoxp12qdewfUDcXx3CDvQ&ust=1462061974125151'
+  };
   $scope.fileReaderSupported = window.FileReader !== null;
   $scope.photoChanged = function(files){
     if (files !== null) {

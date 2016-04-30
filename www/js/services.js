@@ -60,6 +60,27 @@ angular.module('starter.services', [])
       }
       return q.promise;
     },
+    getItemInfo: function(id) {
+      var q = $q.defer();
+      Stamplay.Object('item').get({ _id : id}).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
+    getAreaName: function(id) {
+      var q = $q.defer();
+      Stamplay.Object('area').get({ _id : id}).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
+    getCategoryName: function(id) {
+      var q = $q.defer();
+      Stamplay.Object('category').get({ _id : id}).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
     createItem: function(itemInfo) {
       var q = $q.defer();
       Stamplay.Object('item').save(itemInfo).then(function(res){
