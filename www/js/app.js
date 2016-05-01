@@ -83,7 +83,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','n
     views: {
       'tab-settings': {
         templateUrl: 'templates/tab-settings.html',
-        controller: 'findController'
+        controller: 'settingsController'
       }
     }
   })

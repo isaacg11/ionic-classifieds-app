@@ -2,11 +2,11 @@
   <ion-content>
   	<div class="list">	
 		<div class="item item-divider">Account</div>
-	  	<a class="item item-icon-right" href="#/tab/settings/login" ng-show="!user.email">
+	  	<a class="item item-icon-right" href="#/tab/settings/login" ng-hide="user">
 	    	<i class="icon ion-person"></i>
 	    	Login 
 	  	</a>
-	  	<a class="item item-icon-right" ng-click="logout()" ng-show="user.email">
+	  	<a class="item item-icon-right" ng-click="logout()" ng-hide="notLogged">
 	    	<i class="icon ion-person"></i>
 	    	Logout 
 	  	</a>

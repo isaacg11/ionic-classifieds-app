@@ -95,6 +95,13 @@ angular.module('starter.services', [])
       });
       return q.promise;
     },
+    publishItem: function(id) {
+      var q = $q.defer();
+      Stamplay.Object('item').patch(id, {publish: true}).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
   };
 }])
 
@@ -140,4 +147,34 @@ angular.module('starter.services', [])
       return q.promise;
     }
   };
-}]);
+}])
+
+.factory('PopupTemplate', function(){
+  return {
+    popupEmailPublish : function(){
+      return data = {
+        title: 'Confirm Publish',
+        template: 'Check your email inbox for a confirmation code to complete the publish',
+        buttons: [{text: '<b>Ok</b>', type: 'button-energized'}]
+      };
+    },
+    confirmItem : function($scope){
+      return data = {
+        template: '<input type="text" id="itemId" ng-model="modal.itemId">',
+        title: 'Enter code',
+        subTitle: 'Enter the code we sent you via email',
+        scope: $scope,
+        buttons: [
+          { text: 'Cancel' },
+          {
+            text: '<b>Save</b>',
+            type: 'button-energized',
+            onTap: function(e) {
+              var id = document.getElementById('itemId').value;
+              return id;
+            }
+          }
+        ]  
+      };
+    }};
+});  

@@ -114,7 +114,7 @@ angular.module('starter.controllers', [])
         to: res.data[0].email,
         from: user.email,
         body: user.message,
-        itemName: itemName
+        subject: 'Offer - '+itemName
       };
       Stamplay.Object('email').save(email).then(function(res){
         console.log(res);
@@ -125,7 +125,7 @@ angular.module('starter.controllers', [])
 
 
 
-.controller('publishController', function($scope, $http, ItemFactory, $timeout) {
+.controller('publishController', function($scope, $http, $state, ItemFactory, userFactory, $timeout, IonicComponent, PopupTemplate) {
 //image preview
   $scope.thumbnail = {
     dataUrl: 'https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwjd44G5i7XMAhWIdR4KHbM1DJkQjRwIBw&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FWhite_flag&psig=AFQjCNEul4RFSNoxp12qdewfUDcXx3CDvQ&ust=1462061974125151'
@@ -163,6 +163,8 @@ angular.module('starter.controllers', [])
 
 //publish item to sell
   $scope.publishItem = function(item) { 
+    IonicComponent.Loading.show({template: 'Sending Data...'});
+
     ItemFactory.getAreaId(item.area).then(function(res){
       areaId = res.data[0]._id;
       ItemFactory.getCategoryId(item.category).then(function(res){
@@ -184,11 +186,30 @@ angular.module('starter.controllers', [])
           var files = document.getElementById("files").files;
           var data = new FormData();
           data.append("photo", files[0]);
+          var itemId = res._id;
           var xhr = new XMLHttpRequest();
-          xhr.open('PATCH', 'https://ionic-ebay-app.stamplayapp.com/api/cobject/v1/item/'+res._id, true);
+          xhr.open('PATCH', 'https://ionic-ebay-app.stamplayapp.com/api/cobject/v1/item/'+itemId, true);
           xhr.onload = function(e) {
             if(xhr.status >= 200 && xhr.status < 400) {
-              console.log('item published successfully');
+              IonicComponent.Loading.hide();
+              userFactory.getUser().then(function(res){
+                var userEmail = res.user.email;
+                var fromEmail = 'accounts@stamplay.com';
+                var email = {
+                  to: userEmail,
+                  from: fromEmail,
+                  body: 'Please copy and insert code to complete publish for your offer | '+
+                        'Code : '+itemId,
+                  subject: 'Confirm Publish - '+itemInfo.name,
+                };
+                Stamplay.Object('email').save(email).then(function(res){
+                  var popup = PopupTemplate.popupEmailPublish();
+                  var alertPopup = IonicComponent.Popup.alert(popup);
+                  alertPopup.then(function() {
+                    $state.go('tab.settings');
+                  });
+                });
+              });
             } 
             else {
               console.error(xhr.status + " (" + xhr.statusText + ")" + ": " + xhr.responseText);
@@ -219,7 +240,7 @@ angular.module('starter.controllers', [])
   $scope.goToLogin = function() {
     $state.go('tab.login', {});
   };
-
+//delete item
   $scope.delete = function(id, index){
     $scope.items.splice(index, 1);
     userFactory.deleteTask(id).then(function(){
@@ -229,6 +250,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('loginController', function($scope) {
+//login
   $scope.login = function(user) {
     Stamplay.User.login(user).then(function(res){
       console.log('login successful');
@@ -237,6 +259,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('signupController', function($scope) {
+//signup
   $scope.signup = function(user) {
     var userInfo = {
       firstName: user.firstName,
@@ -247,6 +270,36 @@ angular.module('starter.controllers', [])
 
     Stamplay.User.signup(userInfo).then(function(res){
       $state.go('tab.account');
+    });
+  };
+})
+
+.controller('settingsController', function($scope, $state, userFactory, ItemFactory, PopupTemplate, IonicComponent) {
+//on page load, get current user data
+  userFactory.getUser().then(function(res){
+    if(res === "not logged in") {
+      $scope.notLogged = res;
+    }
+    else{
+      $scope.user = res;
+    }
+  });
+//logout
+  $scope.logout = function() {
+    Stamplay.User.logout().then(function(){
+      console.log('logout successful');
+    });
+  };
+//confirm publish
+  $scope.confirm = function() {
+    var popup = PopupTemplate.confirmItem($scope);
+    var myPopup = IonicComponent.Popup.show(popup);
+    myPopup.then(function(res) {
+      IonicComponent.Loading.show({template: 'Publishing...'});
+      ItemFactory.publishItem(res).then(function(res){
+        IonicComponent.Loading.hide();
+        $state.go('tab.dash');
+      });
     });
   };
 });
