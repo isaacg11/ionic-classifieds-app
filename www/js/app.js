@@ -88,6 +88,26 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services','n
     }
   })
 
+  .state('tab.contact', {
+      url: '/settings/contact',
+      views: {
+        'tab-settings': {
+          templateUrl: 'templates/contact-view.html',
+          controller: 'settingsController'
+        }
+      }
+  })
+
+  .state('tab.terms', {
+      url: '/settings/terms',
+      views: {
+        'tab-settings': {
+          templateUrl: 'templates/terms-view.html',
+          controller: 'settingsController'
+        }
+      }
+  })
+
   .state('tab.login', {
       url: '/settings/login',
       views: {
