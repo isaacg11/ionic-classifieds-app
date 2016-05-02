@@ -145,6 +145,16 @@ angular.module('starter.services', [])
           q.resolve(res);
       });
       return q.promise;
+    },
+    registerUser: function(userInfo) {
+      var q = $q.defer();
+      Stamplay.User.signup(userInfo).then(function(res){
+        q.resolve(res);
+      });
+      return q.promise;
+    },
+    endSession: function() {
+      return Stamplay.User.logout();
     }
   };
 }])

@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('findController', function($scope, ItemFactory, $state, IonicComponent) {
+.controller('findController', function($scope, ItemFactory, $state, IonicComponent, $window) {
 //navigate to item-view state with object id
   $scope.goToItemView = function(areaId, tagsId, description, name, price, dt, photo, ownerId) {
     ItemFactory.getAreaName(areaId).then(function(res){
@@ -12,14 +12,20 @@ angular.module('starter.controllers', [])
     });
   };
 
-//on page load, load areas, categories, and items data
+//on page load, load areas, categories, and published items data
+  var offers = [];
   ItemFactory.getAreas().then(function(areaData){
     $scope.areas = areaData.data;
     ItemFactory.getCategories().then(function(categoryData){
       $scope.categories = categoryData.data;
       ItemFactory.getAllItems().then(function(itemData){
-        $scope.items = itemData.data;
-        IonicComponent.ScrollDelegate.scrollTo(0,245, true);
+        var arr = itemData.data;
+        for(var i = 0; i < arr.length; i ++) {
+          if(arr[i].publish === true) {
+            offers.push(arr[i]);
+          }
+        }
+        $scope.items = offers;
       });
     });
   });
@@ -27,7 +33,7 @@ angular.module('starter.controllers', [])
   $scope.findItem = function(itemName, item){
 //show loading transition 
     $scope.visible = true;
-    $scope.load = true;
+    IonicComponent.Loading.show({template: 'Searching...'});
     $scope.items = {};
 // if user does not enter a name, search by area and category only
     if(angular.equals(itemName, undefined)){
@@ -41,6 +47,8 @@ angular.module('starter.controllers', [])
             tags: categoryId
           };
           ItemFactory.getItemQuery(query).then(function(res){
+            IonicComponent.Loading.hide();
+            $scope.search = true;
             $scope.items = res.data;
           });
         });
@@ -117,13 +125,10 @@ angular.module('starter.controllers', [])
         subject: 'Offer - '+itemName
       };
       Stamplay.Object('email').save(email).then(function(res){
-        console.log(res);
       });
     });
   };
 })
-
-
 
 .controller('publishController', function($scope, $http, $state, ItemFactory, userFactory, $timeout, IonicComponent, PopupTemplate) {
 //image preview
@@ -258,7 +263,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('signupController', function($scope) {
+.controller('signupController', function($scope, $state, IonicComponent, userFactory) {
 //signup
   $scope.signup = function(user) {
     var userInfo = {
@@ -268,7 +273,7 @@ angular.module('starter.controllers', [])
       password: user.password
     };
 
-    Stamplay.User.signup(userInfo).then(function(res){
+    userFactory.registerUser(userInfo).then(function(res){
       $state.go('tab.account');
     });
   };
@@ -277,18 +282,11 @@ angular.module('starter.controllers', [])
 .controller('settingsController', function($scope, $state, userFactory, ItemFactory, PopupTemplate, IonicComponent) {
 //on page load, get current user data
   userFactory.getUser().then(function(res){
-    if(res === "not logged in") {
-      $scope.notLogged = res;
-    }
-    else{
-      $scope.user = res;
-    }
+    $scope.user = res;
   });
 //logout
   $scope.logout = function() {
-    Stamplay.User.logout().then(function(){
-      console.log('logout successful');
-    });
+    userFactory.endSession();
   };
 //confirm publish
   $scope.confirm = function() {

@@ -15,7 +15,10 @@
      <script src="cordova.js"></script>
     <script src="https://drrjhlchpvi7e.cloudfront.net/libs/stamplay-js-sdk/2.0.6/stamplay.min.js"></script>
     <script>
-      Stamplay.init("ionic-ebay-app");
+      Stamplay.init("ionic-ebay-app", {
+        isMobile: true,
+        absoluteUrl : true
+      });
     </script>
 
     <!-- your app's js -->
